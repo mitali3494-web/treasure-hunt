@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shantanu & Mitali's Wedding Treasure Hunt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* All CSS styling remains the same */
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes blink { from, to { opacity: 1; } 50% { opacity: 0; } }
+        body { font-family: 'Caveat', cursive; background-color: #fdf5e6; color: #4a2c2a; padding: 20px; font-size: 18px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { max-width: 600px; width: 100%; background: #fff; border: 2px dashed #ffc0cb; padding: 30px 40px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); animation: popIn 1s ease-out; text-align: center; }
+        h1 { font-family: 'Lobster', cursive; color: #e55a8a; font-size: 2.5em; margin: 0 0 20px 0; line-height:1.2; }
+        p.prompt { font-size: 1.3em; font-weight: 700; }
+        input { font-family: 'Caveat', cursive; padding: 12px; width: 100%; margin-top: 5px; margin-bottom: 15px; font-size: 20px; box-sizing: border-box; border: 2px solid #ddd; border-radius: 10px; text-align: center; text-transform: uppercase; }
+        button { padding: 12px 35px; font-family: 'Lobster', cursive; font-size: 24px; background-color: #32cd99; color: white; text-decoration: none; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0px #2ca880; transition: all 0.1s ease-in-out; width: 100%; }
+        button:hover { transform: translateY(2px); box-shadow: 0 2px 0px #2ca880; }
+        button:disabled { background-color: #999; box-shadow: 0 4px 0px #777; cursor: not-allowed; }
+        .output { margin-top: 25px; padding: 20px; background-color: #e6f7ff; border: 1px solid #b3e0ff; border-radius: 10px; min-height: 100px; text-align: left; font-size: 1.25em; line-height: 1.6; }
+        .output strong { color: #0077b3; }
+        .output .final-info { animation: fadeIn 1s; }
+        .typewriter-text::after { content: '▍'; animation: blink 1s step-end infinite; color: #4a2c2a; }
+        .photo-btn button { width: auto; background-color: #e55a8a; box-shadow: 0 4px 0px #c44a75; }
+        .photo-btn button:hover { box-shadow: 0 2px 0px #c44a75; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Shantanu & Mitali's<br>✨ Wedding Treasure Hunt ✨</h1>
+    <p class="prompt">Enter your 3-Letter Team Code:</p>
+    <input id="team-code" placeholder="E.G., TMM" maxlength="4">
+    <button id="submit-button" onclick="reveal()">Unlock Clue!</button>
+    <div class="output" id="out"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script src="game-data.js"></script>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const locationId = urlParams.get('id');
+
+    function typewriter(text, targetElement, callback) {
+        let i = 0;
+        targetElement.innerHTML = "";
+        targetElement.classList.add('typewriter-text');
+        const interval = setInterval(() => {
+            if (i < text.length) {
+                targetElement.innerHTML += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(interval);
+                targetElement.classList.remove('typewriter-text');
+                if (callback) callback();
+            }
+        }, 40);
+    }
+
+    function triggerConfetti() { if (typeof confetti === 'function') { confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } }); } }
+
+    function reveal(){
+      const shortCode = document.getElementById('team-code').value.trim().toLowerCase();
+      const outputDiv = document.getElementById('out');
+      const submitButton = document.getElementById('submit-button');
+      
+      submitButton.disabled = true;
+      submitButton.innerText = "Unlocking...";
+      outputDiv.innerHTML = ''; 
+
+      if (!locationId) { /* ... error handling ... */ }
+      
+      const fullTeamName = teamCodeMap[shortCode];
+      if (!fullTeamName) { /* ... error handling ... */ }
+
+      const route = teamRoutes[fullTeamName];
+      let currentStep = null;
+
+      for (const step of route) {
+          if (step.location && step.location.toLowerCase() === locationId.toLowerCase()) {
+              currentStep = step;
+              break;
+          }
+      }
+
+      if (!currentStep) { /* ... error handling ... */ }
+      
+      const clueElement = document.createElement('div');
+      outputDiv.appendChild(clueElement);
+      
+      const clueText = `<strong>The Riddle:</strong> ${currentStep.clue}`;
+
+      typewriter(clueText, clueElement, () => {
+        triggerConfetti();
+
+        const finalInfo = document.createElement('div');
+        finalInfo.classList.add('final-info');
+        
+        // --- CHANGE: The lines that displayed the letter and the <hr> have been removed. ---
+        let html = `<br><p><strong>Your Next Location:</strong> ${currentStep.next}</p>`;
+        
+        if(currentStep.photo === 1) { html += `<div class="photo-btn"><a href="phototask.html?task=1"><button>📸 Photo Task 1</button></a></div>`; }
+        if(currentStep.photo === 2) { html += `<div class="photo-btn"><a href="phototask.html?task=2"><button>📸 Photo Task 2</button></a></div>`; }
+        
+        finalInfo.innerHTML = html;
+        outputDiv.appendChild(finalInfo);
+      });
+    }
+</script>
+</body>
+</html>
