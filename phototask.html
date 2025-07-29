@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo Task! | M&S Wedding Hunt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Uses the same cute, 90s theme */
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        body { font-family: 'Caveat', cursive; background-color: #fdf5e6; color: #4a2c2a; padding: 20px; font-size: 18px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { max-width: 600px; margin: 20px auto; background: #fff; border: 2px dashed #e55a8a; padding: 30px 40px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); animation: popIn 1s ease-out; text-align: center; }
+        h1 { font-family: 'Lobster', cursive; color: #e55a8a; font-size: 3em; }
+        p { font-size: 1.5em; line-height: 1.6; }
+        .task-box { margin: 20px 0; padding: 20px; background: #e6f7ff; border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📸 Photo Task! 📸</h1>
+    <div class="task-box" id="task-description">
+        </div>
+    <p>Once you've snapped the perfect picture, just close this page and head to your next location!</p>
+</div>
+<script>
+    const tasks = {
+        '1': "<strong>Task 1: The 'Omkara' Villain Pose!</strong><br>Gather your team at the Orchard and strike your most menacing, gritty, villainous pose under the fruit trees. The more intense, the better!",
+        '2': "<strong>Task 2: The 'Zanjeer' Reflection!</strong><br>Find the Heritage Garden Fountain. Capture a photo of your team's reflection in the water. Funniest or most dramatic faces win bonus points (in our hearts)!"
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('task');
+    const descriptionDiv = document.getElementById('task-description');
+
+    if (tasks[taskId]) {
+        descriptionDiv.innerHTML = `<p>${tasks[taskId]}</p>`;
+    } else {
+        descriptionDiv.innerHTML = "<p>Oops! No task specified. Please go back.</p>";
+    }
+</script>
+</body>
+</html>
